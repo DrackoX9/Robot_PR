@@ -64,8 +64,8 @@ double constValue = 3.85; // (1000*2*pi)/R ---> R = 1980 Resolucion encoder cuad
 double uRobot  = 0;
 double wRobot  = 0;
 double phi = 0;
-const double R = 0.0335; // radio de la llanta
-const double d = 0.185; // Distancia entre llantas
+const double R = 0.0381; // radio de la llanta
+const double d = 0.22352; // Distancia entre llantas
 
 /////////////////////////// BATTERY /////////////////////////
 // const int batteryPin = A6;
@@ -151,12 +151,6 @@ void loop() {
     phi = phi+wRobot*0.1;
 
     
-    //Serial.println(phi,3);
-    //Serial.print(uRobot,3);
-    //Serial.print(", ");
-    //Serial.print(wRobot,3);
-    //Serial.print(", ");
-    //Serial.println(phi,3);
     // outValueR = motor1.compute(data[0],wR);
     // outValueL = motor2.compute(data[1],wL);
     outValueR = motor1.compute(w1Ref,wR);
