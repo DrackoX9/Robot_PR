@@ -1,16 +1,13 @@
-# Robot_PR
-Proyecto de robotica
+# Robot_PR - Proyecto de Robótica
 
-#Para instalar los paquetes utilizados con requeriments.txt
-$ pip install -r requirements.txt
+## Para crear un entorno virtual en Python
+```sh py -m venv env ```
 
-#Para crear un entorno virtual en python
-py -m venv .\[nombre de la carpeta]\ (el nombre se acostumbra poner "env")
+## Para activar el entorno virtual 
+1. Otorgar permisos de ejecucion de script
+```sh Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process ```
+2. Ingresar a la carpeta scripts y ejecutar ./activate/
 
-el codigo se pone en la carpeta src
-
-#para activar el entorno virtual 
-1. otorgar permisos de ejecucion de script
-    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
-2. ingresar a la carpeta scripts y ejecutar ./activate/
-
+## Para instalar los paquetes utilizados con requeriments.txt
+1.   Cambiar el path al env creado
+2.   pip install -r requeriments.txt
