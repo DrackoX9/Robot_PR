@@ -2,8 +2,10 @@
 from pyArduino import *
 
 from tkinter import *
+from tkinter import filedialog
 from PIL import Image, ImageTk #pip install pil
 
+import os
 import cv2
 import numpy as np
 import sys
@@ -50,7 +52,23 @@ def objectDetection(rawImage):
             isObject = True
             
     return isObject,binary,cx,cy
+
+def saveImg():
+    cap.open(url) # Antes de capturar el frame abrimos la url
+    ret, frame = cap.read()
+    if ret:
+        img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        img = Image.fromarray(img)
+        tkimage = ImageTk.PhotoImage(img)
+        label1.configure(image = tkimage)
+        label1.image = tkimage
+        cv2.imwrite(os.getcwd()+"\imagen"+str(numImage.get())+".jpg",frame)
+        numImage.set(numImage.get()+1)
     
+def folder():
+    directorio = filedialog.askdirectory()
+    if directorio !="":
+        os.chdir(directorio)
     
 def callback():
 
@@ -136,7 +154,7 @@ hxd = 0
 
 ########################### Serial communication ###########
 
-port = 'COM3' 
+port = 'COM1'
 arduino = serialArduino(port)
 arduino.readSerialStart()
 
@@ -144,7 +162,14 @@ arduino.readSerialStart()
 
 root = Tk()
 root.protocol("WM_DELETE_WINDOW",onClossing)
-root.title("Vision Artificial") # titulo de la ventana
+root.title("Proyecto Robotica - Vision Artificial") # titulo de la ventana
+
+# Numero de los Screeshots para el nombre en carpeta
+numImage = IntVar()
+numImage.set(0)
+
+buttonDir = Button(root,text ="Carpeta Destino",command=folder) 
+buttonDir.grid(row= 2, padx=20,pady=20)
 
 label=Label(root)
 label.grid(row=0,padx=20,pady=20)

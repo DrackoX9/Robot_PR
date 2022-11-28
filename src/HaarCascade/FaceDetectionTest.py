@@ -1,5 +1,15 @@
 import cv2
 from imutils.video import FPS
+from PIL import Image, ImageTk
+
+from tkinter import filedialog
+from tkinter import *
+import os
+import time
+import numpy as np
+import sys
+
+from lineFollowerRobot import saveImg
 
 # faceCascade = cv2.CascadeClassifier('faceCascade.xml')
 faceCascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
@@ -7,11 +17,12 @@ fullBody = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_fullbody.x
 upperBody = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_upperbody.xml')
 lowerBody = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_lowerbody.xml')
 
-# url='http://192.168.0.17:8080/shot.jpg'
 
-# cap = cv2.VideoCapture(url)
-videoName = 'src/videos/people_bodies.mp4'
-cap = cv2.VideoCapture(videoName)
+url='http://192.168.0.17:8080/shot.jpg'
+
+cap = cv2.VideoCapture(url)
+# videoName = 'src/videos/people_bodies.mp4'
+# cap = cv2.VideoCapture(videoName)
 
 # if cap.isOpened():
 #     print("Cam initializatized")
@@ -20,7 +31,7 @@ cap = cv2.VideoCapture(videoName)
 
 while True:
 
-    # cap.open(videoName)
+    cap.open(url)
     ret, frame = cap.read()
     
     if ret: # Verificar si ha leído correctamente.
@@ -36,7 +47,14 @@ while True:
         #     cv2.rectangle(frame,(x,y),(x+w,y+h),(255,0,0),2)
 
         for (x,y,w,h) in bodies:
-            cv2.rectangle(frame,(x,y),(x+w,y+h),(0,255,0),2)
+
+            a = cv2.rectangle(frame,(x,y),(x+w,y+h),(0,255,0),2)
+            
+            if a.all != None:
+                saveImg()
+                
+                 
+            # a.all = None
             # cv2.imshow("body detection", frame)
         # for (x,y,w,h) in upperBody:
         #     cv2.rectangle(frame,(x,y),(x+w,y+h),(0,255,0),2)
