@@ -114,7 +114,8 @@ def callback():
             
 ########################### Ip Cam ###########################
             
-url='http://192.168.0.6:8080/shot.jpg'
+# url='http://192.168.0.6:8080/shot.jpg'
+url='http://192.168.0.17:8080/shot.jpg'
 
 cap = cv2.VideoCapture(url)
 
