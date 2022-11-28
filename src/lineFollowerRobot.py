@@ -81,7 +81,7 @@ def callback():
 
                 K = 0.0035
                 
-                uRef = 0.2
+                uRef = 0.05 #Velocidad de las ruedas
                 wRef = -K*hxe
 
             else:
