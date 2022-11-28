@@ -21,3 +21,7 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
 1.   Cambiar el path al env creado
 2.   ```pip install -r requeriments.txt```
 
+## Para instalar un paquete en una carpeta especifica
+```sh
+pip install imutils --target=ruta
+```
