@@ -99,7 +99,7 @@ def callback():
 
                 K = 0.0035
                 
-                uRef = 0.2
+                uRef = 0.05
                 wRef = -K*hxe
 
             else:
@@ -132,8 +132,8 @@ def callback():
             
 ########################### Ip Cam ###########################
             
-# url='http://192.168.0.6:8080/shot.jpg'
-url='http://192.168.0.17:8080/shot.jpg'
+url='http://192.168.0.6:8080/shot.jpg'
+#url='http://192.168.0.17:8080/shot.jpg'
 
 cap = cv2.VideoCapture(url)
 
@@ -154,7 +154,7 @@ hxd = 0
 
 ########################### Serial communication ###########
 
-port = 'COM1'
+port = 'COM3'
 arduino = serialArduino(port)
 arduino.readSerialStart()
 
