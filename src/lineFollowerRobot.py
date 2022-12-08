@@ -14,8 +14,8 @@ def toggle():
     btn.config(text=btnVar.get())
   
 def onClossing():
-    arduino.sendData([0,0])
-    arduino.close()
+    # arduino.sendData([0,0])
+    # arduino.close()
     root.quit()         #Salir del bucle de eventos.
     cap.release()       #Cerrar camara
     print("Ip Cam Disconected")
@@ -106,10 +106,10 @@ def callback():
                 uRef = 0
                 wRef = 0
 
-            if btnVar.get() == 'Start':
-                arduino.sendData([uRef,wRef])
-            else:
-                arduino.sendData([0,0])
+            # if btnVar.get() == 'Start':
+            #     arduino.sendData([uRef,wRef])
+            # else:
+            #     arduino.sendData([0,0])
             
             
             img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)    
@@ -132,8 +132,8 @@ def callback():
             
 ########################### Ip Cam ###########################
             
-url='http://192.168.0.6:8080/shot.jpg'
-#url='http://192.168.0.17:8080/shot.jpg'
+# url='http://192.168.0.6:8080/shot.jpg' # CELULAR JOSEPH
+url='http://192.168.0.16:8080/shot.jpg' # CELULAR OMAR
 
 cap = cv2.VideoCapture(url)
 
@@ -154,9 +154,9 @@ hxd = 0
 
 ########################### Serial communication ###########
 
-port = 'COM3'
-arduino = serialArduino(port)
-arduino.readSerialStart()
+# port = 'COM3'
+# arduino = serialArduino(port)
+# arduino.readSerialStart()
 
 ############################## HMI design #################
 
