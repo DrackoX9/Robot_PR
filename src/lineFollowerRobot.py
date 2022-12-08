@@ -174,12 +174,12 @@ def callback():
             wRef = 0
 
             # Llama a las funciones para detectar distintas partes de una persona
-            faceDetection(frameBodyDetection)
+            #faceDetection(frameBodyDetection)
             upperBodyDetection(frameBodyDetection)
-            lowerBodyDetection(frameBodyDetection)
-            fullBodyDetection(frameBodyDetection)
+            #lowerBodyDetection(frameBodyDetection)
+            #fullBodyDetection(frameBodyDetection)
                          
-            isObject,binary,cx,cy = objectDetection(frame)
+            isObject,binary,cx,cy = objectDetection(frame) #comentar esto cuando se usa todo el reconocimiento
             
             cv2.circle(frame,(cx,cy),10, (0,0,255), -1)
             cv2.circle(frame,(cxd,cyd),10, (0,255,0), -1)
@@ -202,24 +202,24 @@ def callback():
             # else:
             #     arduino.sendData([0,0])
 
-            # cv2.imshow('imgBodyDetection',frameBodyDetection)
+            
 
             imgBodyDetection = cv2.cvtColor(frameBodyDetection, cv2.COLOR_BGR2RGB)    
             imgBodyDetection = Image.fromarray(imgBodyDetection)
-            imgBodyDetection.thumbnail((400,400))
+            imgBodyDetection.thumbnail((180,180))
             tkimageBD = ImageTk.PhotoImage(imgBodyDetection)
             labelBDCam.configure(image = tkimageBD)
             labelBDCam.image = tkimageBD
             
             img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)    
             img = Image.fromarray(img)
-            img.thumbnail((400,400))
+            img.thumbnail((180,180))
             tkimage = ImageTk.PhotoImage(img)
             label.configure(image = tkimage)
             label.image = tkimage
             
             img1 = Image.fromarray(binary)
-            img1.thumbnail((400,400))
+            img1.thumbnail((180,180))
             tkimage1 = ImageTk.PhotoImage(img1) 
             label1.configure(image = tkimage1)
             label1.image = tkimage1
