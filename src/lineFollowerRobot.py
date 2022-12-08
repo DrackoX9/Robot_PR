@@ -79,6 +79,16 @@ def upperBodyDetection(rawImagen):
             cv2.rectangle(rawImagen,(x,y),(x+w,y+h),(207, 94, 212),2) # ROSADO
             cv2.circle(rawImagen,(cx,cy), 5, (255,255,0), -1)
 
+def drawRectangle(objectToDetect, rawImage, strokeColor, message):
+    '''Dibuja el rectangulo cuando detecta el objeto especificado'''
+    if len(objectToDetect):
+        print(message)
+        for (x, y, w, h) in objectToDetect:
+            cx = int(x + w / 2)
+            cy = int(y + h / 2)
+            cv2.rectangle(rawImage, (x,y),(x+w, y+h), strokeColor, 2) # ROSADO
+            cv2.circle(rawImage, (cx,cy), 5, (255,255,0), -1)
+
 def lowerBodyDetection(rawImagen):
     '''Detecta la parte baja del cuerpo de una persona'''
     # isObject = False   # Verdadero si encuentra un objeto
@@ -205,7 +215,7 @@ def callback():
 
                 K = 0.0035
                 
-                uRef = 0.05 #Velocidad de las ruedas
+                uRef = 0.05 # Velocidad de las ruedas
                 wRef = -K*hxe
 
             else:
@@ -260,7 +270,7 @@ else:
 cap.open(url)    
 ret, frame = cap.read()
 
-# Camara de deteccion de cuerpoos
+# Camara de deteccion de cuerpos
 
 urlBodyDetection = URL_BODY_DETECTION
 
@@ -269,7 +279,7 @@ capBodyDetection = cv2.VideoCapture(urlBodyDetection)
 if capBodyDetection.isOpened():
     print("Se inicializpó IP Cam correctamente (capBodyDetection)")
 else:
-    sys.exit("IP Cam desconenctada (capBodyDetection)")
+    sys.exit("IP Cam desconectada (capBodyDetection)")
 
 ####################### Desired position in pixels ##############
 
@@ -316,56 +326,5 @@ btn = Checkbutton(root, text=btnVar.get(), width=12, variable=btnVar,
                   command=toggle)
 btn.grid(row = 1,column = 1)
 
-root.after(10,callback) #Es un método definido para todos los widgets tkinter.
+root.after(10,callback) # Es un método definido para todos los widgets tkinter.
 root.mainloop()
-
-
-     
-
-# while True:
-
-    
-    
-#     if ret: # Verificar si ha leído correctamente.
-
-#         faceDetection(frame)
-#         upperBodyDetection(frame)
-#         lowerBodyDetection(frame)
-#         fullBodyDetection(frame)
-        
-#         # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-#         # faces = faceCascade.detectMultiScale(gray,scaleFactor=1.3,minNeighbors=3)
-#         # bodies = fullBody.detectMultiScale(gray,1.1,3)
-#         # upperBody = upperBody.detectMultiScale(gray,scaleFactor=1.3,minNeighbors=5)
-#         # lowerBody = lowerBody.detectMultiScale(gray,scaleFactor=1.3,minNeighbors=5)
-    
-    
-#         # for (x,y,w,h) in faces:
-#         #     cv2.rectangle(frame,(x,y),(x+w,y+h),(255,0,0),2)
-
-#         # for (x,y,w,h) in bodies:
-
-#             # a = cv2.rectangle(frame,(x,y),(x+w,y+h),(0,255,0),2)
-            
-#             # if a.all != None:
-#                 # saveImg()
-#                 # print('tomar foto')
-                
-                 
-#             # a.all = None
-#             # cv2.imshow("body detection", frame)
-#         # for (x,y,w,h) in upperBody:
-#         #     cv2.rectangle(frame,(x,y),(x+w,y+h),(0,255,0),2)
-
-#         # for (x,y,w,h) in lowerBody:
-#         #     cv2.rectangle(frame,(x,y),(x+w,y+h),(0,255,0),2)
-
-#         cv2.imshow('img',frame)
-        
-#     k = cv2.waitKey(10) & 0xff
-#     if k == 27:
-#         break
-
-
-
-
