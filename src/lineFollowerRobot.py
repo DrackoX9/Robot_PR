@@ -3,7 +3,7 @@ from pyArduino import *
 
 from tkinter import *
 from tkinter import filedialog
-from PIL import Image, ImageTk #pip install pil
+from PIL import Image, ImageTk # pip install pil
 
 import os
 import cv2
@@ -20,10 +20,13 @@ lowerBody = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_lowerbody
 URL_LINE_DETECTION = 'http://192.168.0.17:8080/shot.jpg' # OMAR
 URL_BODY_DETECTION = 'http://192.168.0.16:8080/shot.jpg' # OMAR
 
+directorySelected = False
+
 def takePhoto():
     '''Toma foto cuando detecta a una persona y lo guarda en la computadora'''
     capBodyDetection.open(urlBodyDetection) # Antes de capturar el frame abrimos la url
     ret, frame = capBodyDetection.read()
+
     if ret:
         img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         img = Image.fromarray(img)
@@ -35,13 +38,25 @@ def takePhoto():
 
 def folder():
     '''Directorio en donde se guardarán las fotos tomadas'''
+    global directorySelected
     directorio = filedialog.askdirectory()
-    if directorio !="":
+
+    # C:\Users\SnakeHacKx\developer\Robot_PR\src\screenshots #OMAR
+
+    if directorio != "":
         os.chdir(directorio)
+        directorySelected = True
         
 def drawRectangle(objectToDetect, rawImage, strokeColor, message):
     '''Dibuja el rectangulo cuando detecta el objeto especificado'''
+    global directorySelected
+
     if len(objectToDetect):
+         # TODO: Solo deberia tomar la foto cada x segundos
+        if directorySelected == True:
+            # Toma la foto cuando se detecte un objeto y si el directoria ha sido seleccionado
+            takePhoto() 
+            
         print(message)
         for (x, y, w, h) in objectToDetect:
             cx = int(x + w / 2)
@@ -55,7 +70,7 @@ def faceDetection(rawImagen):
     gray = cv2.cvtColor(rawImagen, cv2.COLOR_BGR2GRAY) # Convertir a RGB a grises
 
     ########### Segmentación,Extracción de características,Reconocimiento ################
-    faces = faceCascade.detectMultiScale(gray,scaleFactor=1.1,minNeighbors=4) # Deteccion de objeto
+    faces = faceCascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=4) # Deteccion de objeto
     drawRectangle(faces, rawImagen, (77, 210, 212), 'Se detectó la cara una persona') # CELESTE
 
 def upperBodyDetection(rawImagen):
@@ -64,7 +79,7 @@ def upperBodyDetection(rawImagen):
     gray = cv2.cvtColor(rawImagen, cv2.COLOR_BGR2GRAY) # Convertir a RGB a grises
 
     ########### Segmentación,Extracción de características,Reconocimiento ################
-    upperBodies = upperBody.detectMultiScale(gray,scaleFactor=1.1,minNeighbors=4) # Deteccion de objeto
+    upperBodies = upperBody.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=4) # Deteccion de objeto
     drawRectangle(upperBodies, rawImagen, (199, 87, 216), 'Se detectó la parte superior de una persona') # ROSADO
 
 
@@ -74,7 +89,7 @@ def lowerBodyDetection(rawImagen):
     gray = cv2.cvtColor(rawImagen, cv2.COLOR_BGR2GRAY) # Convertir a RGB a grises
 
     ########### Segmentación,Extracción de características,Reconocimiento ################
-    lowerBodies = lowerBody.detectMultiScale(gray,scaleFactor=1.1,minNeighbors=4) # Deteccion de objeto
+    lowerBodies = lowerBody.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=4) # Deteccion de objeto
     drawRectangle(lowerBodies, rawImagen, (85, 227, 108), 'Se detectó la parte inferior de una persona') # VERDE
 
 
@@ -84,7 +99,7 @@ def fullBodyDetection(rawImagen):
     gray = cv2.cvtColor(rawImagen, cv2.COLOR_BGR2GRAY) # Convertir a RGB a grises
 
     ########### Segmentación,Extracción de características,Reconocimiento ################
-    fullBodies = fullBody.detectMultiScale(gray,scaleFactor=1.1,minNeighbors=4) # Deteccion de objeto
+    fullBodies = fullBody.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=4) # Deteccion de objeto
     drawRectangle(fullBodies, rawImagen, (217, 90, 90), 'Se detectó el cuerpo completo de una persona') # ROJO
 
 def toggle():
@@ -105,8 +120,8 @@ def thresholdValue(int):
     
 def objectDetection(rawImage):
     kernel = np.ones((10,10),np.uint8) # Nucleo
-    isObject = False     # Verdadero si encuentra un objeto
-    cx,cy = 0,0          #centroide (x), centroide (y)
+    isObject = False # Verdadero si encuentra un objeto
+    cx,cy = 0,0 # centroide (x), centroide (y)
     
     minArea = 500  # Area minima para considerar que es un objeto
 
