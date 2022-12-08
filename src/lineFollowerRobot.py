@@ -10,6 +10,8 @@ import cv2
 import numpy as np
 import sys
 
+import time
+
 # Modelos entrenados por defecto
 faceCascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 fullBody = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_fullbody.xml')
@@ -21,6 +23,7 @@ URL_LINE_DETECTION = 'http://192.168.0.17:8080/shot.jpg' # OMAR
 URL_BODY_DETECTION = 'http://192.168.0.16:8080/shot.jpg' # OMAR
 
 directorySelected = False
+lastTimePhotoTaked = 0
 
 def takePhoto():
     '''Toma foto cuando detecta a una persona y lo guarda en la computadora'''
@@ -50,12 +53,21 @@ def folder():
 def drawRectangle(objectToDetect, rawImage, strokeColor, message):
     '''Dibuja el rectangulo cuando detecta el objeto especificado'''
     global directorySelected
+    global lastTimePhotoTaked
 
     if len(objectToDetect):
          # TODO: Solo deberia tomar la foto cada x segundos
         if directorySelected == True:
             # Toma la foto cuando se detecte un objeto y si el directoria ha sido seleccionado
-            takePhoto() 
+            
+            actualTime = time.time()
+            timePassed = actualTime - lastTimePhotoTaked
+
+            # Toma una foto cada x segundos o si todavia no ha tomado ninguna foto
+            if timePassed >= 10.0 - ((actualTime - lastTimePhotoTaked) % 10.0) or lastTimePhotoTaked == 0:
+                print("***********TOMÓ UNA FOTO ***********")
+                lastTimePhotoTaked = time.time()
+                takePhoto() 
             
         print(message)
         for (x, y, w, h) in objectToDetect:
