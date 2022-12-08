@@ -56,7 +56,6 @@ def drawRectangle(objectToDetect, rawImage, strokeColor, message):
     global lastTimePhotoTaked
 
     if len(objectToDetect):
-         # TODO: Solo deberia tomar la foto cada x segundos
         if directorySelected == True:
             # Toma la foto cuando se detecte un objeto y si el directoria ha sido seleccionado
             
@@ -82,7 +81,10 @@ def faceDetection(rawImagen):
     gray = cv2.cvtColor(rawImagen, cv2.COLOR_BGR2GRAY) # Convertir a RGB a grises
 
     ########### Segmentación,Extracción de características,Reconocimiento ################
-    faces = faceCascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=4) # Deteccion de objeto
+    # const int scale = 3;
+    # cv2.Mat resized_frame_gray( cvRound( frame_gray.rows / scale ), cvRound( frame_gray.cols / scale ), CV_8UC1 );
+    # cv2.resize( frame_gray, resized_frame_gray, resized_frame_gray.size() );
+    faces = faceCascade.detectMultiScale(gray, scaleFactor=1.3, minNeighbors=4) # Deteccion de objeto
     drawRectangle(faces, rawImagen, (77, 210, 212), 'Se detectó la cara una persona') # CELESTE
 
 def upperBodyDetection(rawImagen):
@@ -91,7 +93,7 @@ def upperBodyDetection(rawImagen):
     gray = cv2.cvtColor(rawImagen, cv2.COLOR_BGR2GRAY) # Convertir a RGB a grises
 
     ########### Segmentación,Extracción de características,Reconocimiento ################
-    upperBodies = upperBody.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=4) # Deteccion de objeto
+    upperBodies = upperBody.detectMultiScale(gray, scaleFactor=1.3, minNeighbors=4) # Deteccion de objeto
     drawRectangle(upperBodies, rawImagen, (199, 87, 216), 'Se detectó la parte superior de una persona') # ROSADO
 
 
@@ -101,7 +103,7 @@ def lowerBodyDetection(rawImagen):
     gray = cv2.cvtColor(rawImagen, cv2.COLOR_BGR2GRAY) # Convertir a RGB a grises
 
     ########### Segmentación,Extracción de características,Reconocimiento ################
-    lowerBodies = lowerBody.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=4) # Deteccion de objeto
+    lowerBodies = lowerBody.detectMultiScale(gray, scaleFactor=1.3, minNeighbors=4) # Deteccion de objeto
     drawRectangle(lowerBodies, rawImagen, (85, 227, 108), 'Se detectó la parte inferior de una persona') # VERDE
 
 
@@ -111,7 +113,7 @@ def fullBodyDetection(rawImagen):
     gray = cv2.cvtColor(rawImagen, cv2.COLOR_BGR2GRAY) # Convertir a RGB a grises
 
     ########### Segmentación,Extracción de características,Reconocimiento ################
-    fullBodies = fullBody.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=4) # Deteccion de objeto
+    fullBodies = fullBody.detectMultiScale(gray, scaleFactor=1.3, minNeighbors=4) # Deteccion de objeto
     drawRectangle(fullBodies, rawImagen, (217, 90, 90), 'Se detectó el cuerpo completo de una persona') # ROJO
 
 def toggle():
@@ -176,8 +178,7 @@ def callback():
             upperBodyDetection(frameBodyDetection)
             lowerBodyDetection(frameBodyDetection)
             fullBodyDetection(frameBodyDetection)
-                
-            
+                         
             isObject,binary,cx,cy = objectDetection(frame)
             
             cv2.circle(frame,(cx,cy),10, (0,0,255), -1)
@@ -242,11 +243,16 @@ else:
 cap.open(url)    
 ret, frame = cap.read()
 
+
 # Camara de deteccion de cuerpos
 
 urlBodyDetection = URL_BODY_DETECTION
 
 capBodyDetection = cv2.VideoCapture(urlBodyDetection)
+
+cap.open(url) # Antes de capturar el frame abrimos la url Leer Frame
+
+capBodyDetection.open(urlBodyDetection) 
 
 if capBodyDetection.isOpened():
     print("Se inicializpó IP Cam correctamente (capBodyDetection)")
