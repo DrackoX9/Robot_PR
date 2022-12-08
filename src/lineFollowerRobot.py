@@ -10,6 +10,7 @@ import cv2
 import numpy as np
 import sys
 
+# Modelos entrenados por defecto
 faceCascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 fullBody = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_fullbody.xml')
 upperBody = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_upperbody.xml')
@@ -18,7 +19,6 @@ lowerBody = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_lowerbody
 # URL_LINE_DETECTION = 'http://192.168.0.16:8080/shot.jpg' # JOSEPH
 URL_LINE_DETECTION = 'http://192.168.0.17:8080/shot.jpg' # OMAR
 URL_BODY_DETECTION = 'http://192.168.0.16:8080/shot.jpg' # OMAR
-
 
 def takePhoto():
     '''Toma foto cuando detecta a una persona y lo guarda en la computadora'''
@@ -31,54 +31,14 @@ def takePhoto():
         label1.configure(image = tkimage)
         label1.image = tkimage
         cv2.imwrite(os.getcwd()+"\imagen"+str(numImage.get())+".jpg",frame)
-        numImage.set(numImage.get()+1)
+        numImage.set(numImage.get() + 1)
 
 def folder():
     '''Directorio en donde se guardarán las fotos tomadas'''
     directorio = filedialog.askdirectory()
     if directorio !="":
         os.chdir(directorio)
-
-def faceDetection(rawImagen):
-    '''Detecta el rostro de una persona'''
-    # isObject = False   # Verdadero si encuentra un objeto
-    
-    cx,cy = 0,0  #centroide (x), centroide (y)
-                       
-    ################# Procesamiento de la Imagen ##########
-    gray = cv2.cvtColor(rawImagen, cv2.COLOR_BGR2GRAY) # Convertir a RGB a grises
-
-    ########### Segmentación,Extracción de características,Reconocimiento ################
-    faces = faceCascade.detectMultiScale(gray,scaleFactor=1.1,minNeighbors=4) # Deteccion de objeto
-    
-    if len(faces):
-        print('Se encontró una cara')
-        for (x,y,w,h) in faces:
-            cx = int(x+w/2)
-            cy = int(y+h/2)
-            cv2.rectangle(rawImagen,(x,y),(x+w,y+h),(77, 210, 212),2) # CELESTE
-            cv2.circle(rawImagen,(cx,cy), 5, (255,255,0), -1)
-
-def upperBodyDetection(rawImagen):
-    '''Detecta la parte alta del cuerpo de una persona'''
-    # isObject = False   # Verdadero si encuentra un objeto
-    
-    cx,cy = 0,0  #centroide (x), centroide (y)
-                       
-    ################# Procesamiento de la Imagen ##########
-    gray = cv2.cvtColor(rawImagen, cv2.COLOR_BGR2GRAY) # Convertir a RGB a grises
-
-    ########### Segmentación,Extracción de características,Reconocimiento ################
-    upperBodies = upperBody.detectMultiScale(gray,scaleFactor=1.1,minNeighbors=4) # Deteccion de objeto
-    
-    if len(upperBodies):
-        print('Se encontró una parte superior de un cuerpo')
-        for (x,y,w,h) in upperBodies:
-            cx = int(x+w/2)
-            cy = int(y+h/2)
-            cv2.rectangle(rawImagen,(x,y),(x+w,y+h),(207, 94, 212),2) # ROSADO
-            cv2.circle(rawImagen,(cx,cy), 5, (255,255,0), -1)
-
+        
 def drawRectangle(objectToDetect, rawImage, strokeColor, message):
     '''Dibuja el rectangulo cuando detecta el objeto especificado'''
     if len(objectToDetect):
@@ -86,52 +46,46 @@ def drawRectangle(objectToDetect, rawImage, strokeColor, message):
         for (x, y, w, h) in objectToDetect:
             cx = int(x + w / 2)
             cy = int(y + h / 2)
-            cv2.rectangle(rawImage, (x,y),(x+w, y+h), strokeColor, 2) # ROSADO
-            cv2.circle(rawImage, (cx,cy), 5, (255,255,0), -1)
+            cv2.rectangle(rawImage, (x, y),(x+w, y+h), strokeColor, 2) # ROSADO
+            cv2.circle(rawImage, (cx, cy), 5, (255, 255, 0), -1)
+
+def faceDetection(rawImagen):
+    '''Detecta el rostro de una persona'''                  
+    ################# Procesamiento de la Imagen ##########
+    gray = cv2.cvtColor(rawImagen, cv2.COLOR_BGR2GRAY) # Convertir a RGB a grises
+
+    ########### Segmentación,Extracción de características,Reconocimiento ################
+    faces = faceCascade.detectMultiScale(gray,scaleFactor=1.1,minNeighbors=4) # Deteccion de objeto
+    drawRectangle(faces, rawImagen, (77, 210, 212), 'Se detectó la cara una persona') # CELESTE
+
+def upperBodyDetection(rawImagen):
+    '''Detecta la parte alta del cuerpo de una persona'''                  
+    ################# Procesamiento de la Imagen ##########
+    gray = cv2.cvtColor(rawImagen, cv2.COLOR_BGR2GRAY) # Convertir a RGB a grises
+
+    ########### Segmentación,Extracción de características,Reconocimiento ################
+    upperBodies = upperBody.detectMultiScale(gray,scaleFactor=1.1,minNeighbors=4) # Deteccion de objeto
+    drawRectangle(upperBodies, rawImagen, (199, 87, 216), 'Se detectó la parte superior de una persona') # ROSADO
+
 
 def lowerBodyDetection(rawImagen):
-    '''Detecta la parte baja del cuerpo de una persona'''
-    # isObject = False   # Verdadero si encuentra un objeto
-    
-    cx,cy = 0,0  #centroide (x), centroide (y)
-                       
+    '''Detecta la parte baja del cuerpo de una persona'''                  
     ################# Procesamiento de la Imagen ##########
     gray = cv2.cvtColor(rawImagen, cv2.COLOR_BGR2GRAY) # Convertir a RGB a grises
 
     ########### Segmentación,Extracción de características,Reconocimiento ################
     lowerBodies = lowerBody.detectMultiScale(gray,scaleFactor=1.1,minNeighbors=4) # Deteccion de objeto
-    
-    if len(lowerBodies):
-        print('Se encontró una parte inferior de un cuerpo')
-        for (x,y,w,h) in lowerBodies:
-            cx = int(x+w/2)
-            cy = int(y+h/2)
-            cv2.rectangle(rawImagen,(x,y),(x+w,y+h),(85, 227, 108),2) # VERDE
-            cv2.circle(rawImagen,(cx,cy), 5, (255,255,0), -1)
+    drawRectangle(lowerBodies, rawImagen, (85, 227, 108), 'Se detectó la parte inferior de una persona') # VERDE
 
 
 def fullBodyDetection(rawImagen):
-    '''Detecta el cuerpo entero de una persona'''
-    
-    # isObject = False   # Verdadero si encuentra un objeto
-    
-    cx,cy = 0,0  #centroide (x), centroide (y)
-                       
+    '''Detecta el cuerpo entero de una persona'''                 
     ################# Procesamiento de la Imagen ##########
     gray = cv2.cvtColor(rawImagen, cv2.COLOR_BGR2GRAY) # Convertir a RGB a grises
 
     ########### Segmentación,Extracción de características,Reconocimiento ################
     fullBodies = fullBody.detectMultiScale(gray,scaleFactor=1.1,minNeighbors=4) # Deteccion de objeto
-    
-    if len(fullBodies):
-        print('Se encontró un cuerpo completo')
-        for (x,y,w,h) in fullBodies:
-            cx = int(x+w/2)
-            cy = int(y+h/2)
-            cv2.rectangle(rawImagen,(x,y),(x+w,y+h),(217, 90, 90),2) # ROJO
-            cv2.circle(rawImagen,(cx,cy), 5, (255,255,0), -1)
-   
-
+    drawRectangle(fullBodies, rawImagen, (217, 90, 90), 'Se detectó el cuerpo completo de una persona') # ROJO
 
 def toggle():
     btn.config(text=btnVar.get())
@@ -144,8 +98,7 @@ def onClossing():
     capBodyDetection.release()
     # cv2.destroyAllWindows()
     print("IP CAMS Desconectadas")
-    root.destroy()      #Destruye la ventana creada
-    
+    root.destroy()      #Destruye la ventana creada  
     
 def thresholdValue(int):
     umbralValue.set(slider.get())
@@ -169,16 +122,15 @@ def objectDetection(rawImage):
     for cnt in contours:
         momentos = cv2.moments(cnt)
         area = momentos['m00']
-        if (area>minArea):
-            cx = int(momentos['m10']/momentos['m00'])     
-            cy = int(momentos['m01']/momentos['m00'])
+        if (area > minArea):
+            cx = int(momentos['m10'] / momentos['m00'])     
+            cy = int(momentos['m01'] / momentos['m00'])
             isObject = True
             
-    return isObject,binary,cx,cy
+    return isObject, binary, cx, cy
 
     
 def callback():
-
         ################## Adquisición de la Imagen ############
         
         cap.open(url) # Antes de capturar el frame abrimos la url
@@ -186,7 +138,6 @@ def callback():
 
         capBodyDetection.open(urlBodyDetection)
         ret, frameBodyDetection = capBodyDetection.read()    
-        
 
         if ret:
             
@@ -208,11 +159,7 @@ def callback():
             if isObject:
                 
                 hx = frame.shape[1]/2-cx
-                
-                
                 hxe  = hxd-hx
-                
-
                 K = 0.0035
                 
                 uRef = 0.05 # Velocidad de las ruedas
@@ -236,7 +183,6 @@ def callback():
             labelBDCam.configure(image = tkimageBD)
             labelBDCam.image = tkimageBD
             
-            
             img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)    
             img = Image.fromarray(img)
             img.thumbnail((400,400))
@@ -251,7 +197,6 @@ def callback():
             label1.image = tkimage1
             
             root.after(10,callback)
-            
         else:
             onClossing()
             
