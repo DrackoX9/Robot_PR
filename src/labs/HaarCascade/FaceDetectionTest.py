@@ -1,13 +1,6 @@
 import cv2
-from imutils.video import FPS
-from PIL import Image, ImageTk
 
-from tkinter import filedialog
 from tkinter import *
-import os
-import time
-import numpy as np
-import sys
 
 # from lineFollowerRobot import saveImg
 

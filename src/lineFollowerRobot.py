@@ -10,6 +10,119 @@ import cv2
 import numpy as np
 import sys
 
+faceCascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+fullBody = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_fullbody.xml')
+upperBody = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_upperbody.xml')
+lowerBody = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_lowerbody.xml')
+
+# URL_LINE_DETECTION = 'http://192.168.0.16:8080/shot.jpg' # JOSEPH
+URL_LINE_DETECTION = 'http://192.168.0.17:8080/shot.jpg' # OMAR
+URL_BODY_DETECTION = 'http://192.168.0.16:8080/shot.jpg' # OMAR
+
+
+def takePhoto():
+    '''Toma foto cuando detecta a una persona y lo guarda en la computadora'''
+    capBodyDetection.open(urlBodyDetection) # Antes de capturar el frame abrimos la url
+    ret, frame = capBodyDetection.read()
+    if ret:
+        img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        img = Image.fromarray(img)
+        tkimage = ImageTk.PhotoImage(img)
+        label1.configure(image = tkimage)
+        label1.image = tkimage
+        cv2.imwrite(os.getcwd()+"\imagen"+str(numImage.get())+".jpg",frame)
+        numImage.set(numImage.get()+1)
+
+def folder():
+    '''Directorio en donde se guardarán las fotos tomadas'''
+    directorio = filedialog.askdirectory()
+    if directorio !="":
+        os.chdir(directorio)
+
+def faceDetection(rawImagen):
+    '''Detecta el rostro de una persona'''
+    # isObject = False   # Verdadero si encuentra un objeto
+    
+    cx,cy = 0,0  #centroide (x), centroide (y)
+                       
+    ################# Procesamiento de la Imagen ##########
+    gray = cv2.cvtColor(rawImagen, cv2.COLOR_BGR2GRAY) # Convertir a RGB a grises
+
+    ########### Segmentación,Extracción de características,Reconocimiento ################
+    faces = faceCascade.detectMultiScale(gray,scaleFactor=1.1,minNeighbors=4) # Deteccion de objeto
+    
+    if len(faces):
+        print('Se encontró una cara')
+        for (x,y,w,h) in faces:
+            cx = int(x+w/2)
+            cy = int(y+h/2)
+            cv2.rectangle(rawImagen,(x,y),(x+w,y+h),(77, 210, 212),2) # CELESTE
+            cv2.circle(rawImagen,(cx,cy), 5, (255,255,0), -1)
+
+def upperBodyDetection(rawImagen):
+    '''Detecta la parte alta del cuerpo de una persona'''
+    # isObject = False   # Verdadero si encuentra un objeto
+    
+    cx,cy = 0,0  #centroide (x), centroide (y)
+                       
+    ################# Procesamiento de la Imagen ##########
+    gray = cv2.cvtColor(rawImagen, cv2.COLOR_BGR2GRAY) # Convertir a RGB a grises
+
+    ########### Segmentación,Extracción de características,Reconocimiento ################
+    upperBodies = upperBody.detectMultiScale(gray,scaleFactor=1.1,minNeighbors=4) # Deteccion de objeto
+    
+    if len(upperBodies):
+        print('Se encontró una parte superior de un cuerpo')
+        for (x,y,w,h) in upperBodies:
+            cx = int(x+w/2)
+            cy = int(y+h/2)
+            cv2.rectangle(rawImagen,(x,y),(x+w,y+h),(207, 94, 212),2) # ROSADO
+            cv2.circle(rawImagen,(cx,cy), 5, (255,255,0), -1)
+
+def lowerBodyDetection(rawImagen):
+    '''Detecta la parte baja del cuerpo de una persona'''
+    # isObject = False   # Verdadero si encuentra un objeto
+    
+    cx,cy = 0,0  #centroide (x), centroide (y)
+                       
+    ################# Procesamiento de la Imagen ##########
+    gray = cv2.cvtColor(rawImagen, cv2.COLOR_BGR2GRAY) # Convertir a RGB a grises
+
+    ########### Segmentación,Extracción de características,Reconocimiento ################
+    lowerBodies = lowerBody.detectMultiScale(gray,scaleFactor=1.1,minNeighbors=4) # Deteccion de objeto
+    
+    if len(lowerBodies):
+        print('Se encontró una parte inferior de un cuerpo')
+        for (x,y,w,h) in lowerBodies:
+            cx = int(x+w/2)
+            cy = int(y+h/2)
+            cv2.rectangle(rawImagen,(x,y),(x+w,y+h),(85, 227, 108),2) # VERDE
+            cv2.circle(rawImagen,(cx,cy), 5, (255,255,0), -1)
+
+
+def fullBodyDetection(rawImagen):
+    '''Detecta el cuerpo entero de una persona'''
+    
+    # isObject = False   # Verdadero si encuentra un objeto
+    
+    cx,cy = 0,0  #centroide (x), centroide (y)
+                       
+    ################# Procesamiento de la Imagen ##########
+    gray = cv2.cvtColor(rawImagen, cv2.COLOR_BGR2GRAY) # Convertir a RGB a grises
+
+    ########### Segmentación,Extracción de características,Reconocimiento ################
+    fullBodies = fullBody.detectMultiScale(gray,scaleFactor=1.1,minNeighbors=4) # Deteccion de objeto
+    
+    if len(fullBodies):
+        print('Se encontró un cuerpo completo')
+        for (x,y,w,h) in fullBodies:
+            cx = int(x+w/2)
+            cy = int(y+h/2)
+            cv2.rectangle(rawImagen,(x,y),(x+w,y+h),(217, 90, 90),2) # ROJO
+            cv2.circle(rawImagen,(cx,cy), 5, (255,255,0), -1)
+   
+
+
 def toggle():
     btn.config(text=btnVar.get())
   
@@ -18,7 +131,9 @@ def onClossing():
     # arduino.close()
     root.quit()         #Salir del bucle de eventos.
     cap.release()       #Cerrar camara
-    print("Ip Cam Disconected")
+    capBodyDetection.release()
+    # cv2.destroyAllWindows()
+    print("IP CAMS Desconectadas")
     root.destroy()      #Destruye la ventana creada
     
     
@@ -26,8 +141,6 @@ def thresholdValue(int):
     umbralValue.set(slider.get())
     
 def objectDetection(rawImage):
-    
-    
     kernel = np.ones((10,10),np.uint8) # Nucleo
     isObject = False     # Verdadero si encuentra un objeto
     cx,cy = 0,0          #centroide (x), centroide (y)
@@ -53,22 +166,6 @@ def objectDetection(rawImage):
             
     return isObject,binary,cx,cy
 
-def saveImg():
-    cap.open(url) # Antes de capturar el frame abrimos la url
-    ret, frame = cap.read()
-    if ret:
-        img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        img = Image.fromarray(img)
-        tkimage = ImageTk.PhotoImage(img)
-        label1.configure(image = tkimage)
-        label1.image = tkimage
-        cv2.imwrite(os.getcwd()+"\imagen"+str(numImage.get())+".jpg",frame)
-        numImage.set(numImage.get()+1)
-    
-def folder():
-    directorio = filedialog.askdirectory()
-    if directorio !="":
-        os.chdir(directorio)
     
 def callback():
 
@@ -76,12 +173,21 @@ def callback():
         
         cap.open(url) # Antes de capturar el frame abrimos la url
         ret, frame = cap.read() # Leer Frame
+
+        capBodyDetection.open(urlBodyDetection)
+        ret, frameBodyDetection = capBodyDetection.read()    
         
 
         if ret:
             
             uRef = 0
             wRef = 0
+
+            # Llama a las funciones para detectar distintas partes de una persona
+            faceDetection(frameBodyDetection)
+            upperBodyDetection(frameBodyDetection)
+            lowerBodyDetection(frameBodyDetection)
+            fullBodyDetection(frameBodyDetection)
                 
             
             isObject,binary,cx,cy = objectDetection(frame)
@@ -110,6 +216,15 @@ def callback():
             #     arduino.sendData([uRef,wRef])
             # else:
             #     arduino.sendData([0,0])
+
+            # cv2.imshow('imgBodyDetection',frameBodyDetection)
+
+            imgBodyDetection = cv2.cvtColor(frameBodyDetection, cv2.COLOR_BGR2RGB)    
+            imgBodyDetection = Image.fromarray(imgBodyDetection)
+            imgBodyDetection.thumbnail((400,400))
+            tkimageBD = ImageTk.PhotoImage(imgBodyDetection)
+            labelBDCam.configure(image = tkimageBD)
+            labelBDCam.image = tkimageBD
             
             
             img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)    
@@ -131,19 +246,30 @@ def callback():
             onClossing()
             
 ########################### Ip Cam ###########################
-            
-# url='http://192.168.0.6:8080/shot.jpg' # CELULAR JOSEPH
-url='http://192.168.0.16:8080/shot.jpg' # CELULAR OMAR
+
+# Camara de deteccion de linea  
+url = URL_LINE_DETECTION
 
 cap = cv2.VideoCapture(url)
 
 if cap.isOpened():
-    print("Ip Cam initializatized")
+    print("Se inicializpó IP Cam correctamente (cap)")
 else:
-    sys.exit("Ip Cam disconnected")
+    sys.exit("IP Cam desconectada (cap)")
 
 cap.open(url)    
 ret, frame = cap.read()
+
+# Camara de deteccion de cuerpoos
+
+urlBodyDetection = URL_BODY_DETECTION
+
+capBodyDetection = cv2.VideoCapture(urlBodyDetection)
+
+if capBodyDetection.isOpened():
+    print("Se inicializpó IP Cam correctamente (capBodyDetection)")
+else:
+    sys.exit("IP Cam desconenctada (capBodyDetection)")
 
 ####################### Desired position in pixels ##############
 
@@ -177,6 +303,9 @@ label.grid(row=0,padx=20,pady=20)
 label1=Label(root)
 label1.grid(row= 0,column=1,padx=20,pady=20)
 
+labelBDCam=Label(root)
+labelBDCam.grid(row= 4,column=0,padx=20,pady=20)
+
 umbralValue = IntVar()
 slider = Scale(root,label = 'Threshold value', from_=0, to=255, orient=HORIZONTAL,command=thresholdValue,length=400)   #Creamos un dial para recoger datos numericos
 slider.grid(row = 1)
@@ -189,3 +318,54 @@ btn.grid(row = 1,column = 1)
 
 root.after(10,callback) #Es un método definido para todos los widgets tkinter.
 root.mainloop()
+
+
+     
+
+# while True:
+
+    
+    
+#     if ret: # Verificar si ha leído correctamente.
+
+#         faceDetection(frame)
+#         upperBodyDetection(frame)
+#         lowerBodyDetection(frame)
+#         fullBodyDetection(frame)
+        
+#         # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+#         # faces = faceCascade.detectMultiScale(gray,scaleFactor=1.3,minNeighbors=3)
+#         # bodies = fullBody.detectMultiScale(gray,1.1,3)
+#         # upperBody = upperBody.detectMultiScale(gray,scaleFactor=1.3,minNeighbors=5)
+#         # lowerBody = lowerBody.detectMultiScale(gray,scaleFactor=1.3,minNeighbors=5)
+    
+    
+#         # for (x,y,w,h) in faces:
+#         #     cv2.rectangle(frame,(x,y),(x+w,y+h),(255,0,0),2)
+
+#         # for (x,y,w,h) in bodies:
+
+#             # a = cv2.rectangle(frame,(x,y),(x+w,y+h),(0,255,0),2)
+            
+#             # if a.all != None:
+#                 # saveImg()
+#                 # print('tomar foto')
+                
+                 
+#             # a.all = None
+#             # cv2.imshow("body detection", frame)
+#         # for (x,y,w,h) in upperBody:
+#         #     cv2.rectangle(frame,(x,y),(x+w,y+h),(0,255,0),2)
+
+#         # for (x,y,w,h) in lowerBody:
+#         #     cv2.rectangle(frame,(x,y),(x+w,y+h),(0,255,0),2)
+
+#         cv2.imshow('img',frame)
+        
+#     k = cv2.waitKey(10) & 0xff
+#     if k == 27:
+#         break
+
+
+
+
