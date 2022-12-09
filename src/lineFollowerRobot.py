@@ -134,23 +134,23 @@ def thresholdValue(int):
     umbralValue.set(slider.get())
     
 def objectDetection(rawImage):
-    kernel = np.ones((10,10),np.uint8) # Nucleo
-    isObject = False # Verdadero si encuentra un objeto
-    cx,cy = 0,0 # centroide (x), centroide (y)
+    kernel = np.ones((10,10),np.uint8)  # Nucleo
+    isObject = False                    # Verdadero si encuentra un objeto
+    cx,cy = 0,0                         # centroide (x), centroide (y)
     
-    minArea = 500  # Area minima para considerar que es un objeto
+    minArea = 500                       # Area minima para considerar que es un objeto
 
     ################# Procesamiento de la Imagen ################
     
-    gray = cv2.cvtColor(rawImage, cv2.COLOR_BGR2GRAY)
-    t,binary = cv2.threshold(gray, umbralValue.get(), 255, cv2.THRESH_BINARY_INV)
-    opening = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)
+    gray = cv2.cvtColor(rawImage, cv2.COLOR_BGR2GRAY)       #transformacion a escala de grises 
+    t,binary = cv2.threshold(gray, umbralValue.get(), 255, cv2.THRESH_BINARY_INV) #tranformacion a threshold
+    opening = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)      #transformacion de erosion seguida de dilatacion
 
     ################# Segmentacion de la Imagen ################
     contours,_ = cv2.findContours(opening.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     for cnt in contours:
-        momentos = cv2.moments(cnt)
+        momentos = cv2.moments(cnt)         #calculo del centroide de los segmentos que tengan area mayor a la minima
         area = momentos['m00']
         if (area > minArea):
             cx = int(momentos['m10'] / momentos['m00'])     
@@ -171,7 +171,7 @@ def callback():
 
         if ret:
             
-            uRef = 0
+            uRef = 0        #valor inicial de las velocidades 
             wRef = 0
 
             # Llama a las funciones para detectar distintas partes de una persona
@@ -187,12 +187,12 @@ def callback():
 
             if isObject:
                 
-                hx = frame.shape[1]/2-cx
-                hxe  = hxd-hx
-                K = 0.0035
+                hx = frame.shape[1]/2-cx        #calculo del centro de la imagen
+                hxe  = hxd-hx                   #diferencia entre el centro de la imagen y el centro de la forma 
+                K = 0.0035                      #constante
                 
-                uRef = 0.05 # Velocidad de las ruedas
-                wRef = -K*hxe
+                uRef = 0.05     # Velocidad de lineal las ruedas
+                wRef = -K*hxe   #velocidad angular 
 
             else:
                 uRef = 0
