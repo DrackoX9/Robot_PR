@@ -1,6 +1,6 @@
 #include "PinChangeInterrupt.h"
 
-#include "motorControl.h"
+#include "motorControl.h" //libreria para el control de los motores
 
 
 
@@ -8,35 +8,35 @@
 
 
 
-unsigned long lastTime, sampleTime = 100;
-motorControl motor1(sampleTime);
+unsigned long lastTime, sampleTime = 100;  //tiempo de muestreo
+motorControl motor1(sampleTime);          //creando objetos de los motores
 motorControl motor2(sampleTime);
 
 ///////////////////// COMUNICACION SERIAL ////////////////
 
-String inputString = "";
+String inputString = "";          //cadena con los datos enviados desde python
 bool stringComplete = false;
 const char separator = ',';
 const int dataLength = 2;
-double data[dataLength];
+double data[dataLength];        //almacena los datos una vez extraidos de la cadena 
 
 //////////////////////MOTOR DERECHO///////////////////////////////
 
 //// Ojo se ha invertido canales////////
 const int    C1R = 2;    // Entrada de la señal A del encoder.
 const int    C2R = 3;    // Entrada de la señal B del encoder.
-int outValueR = 0;
+int outValueR = 0;      //valor de la potencia del motor
 
 //// Puente H L298N ////
 const int    in1 = 7;                 
 const int    in2 = 8;         
 const int    enA = 6;               
 
-volatile int countR = 0;
+volatile int countR = 0;    //contador que indica la direccion de giro
 volatile int antR   = 0;
 volatile int actR   = 0;
 
-double wR = 0;
+double wR = 0;              //variable de proceso
 double w1Ref = 0;
 
 //////////////////////MOTOR IZQUIERDO///////////////////////////////
@@ -61,9 +61,9 @@ double w2Ref = 0;
 double constValue = 3.85; // (1000*2*pi)/R ---> R = 1980 Resolucion encoder cuadruple
 
 //////////////////////// ROBOT /////////////////////////
-double uRobot  = 0;
-double wRobot  = 0;
-double phi = 0;
+double uRobot  = 0;       //velocidad lineal del robot
+double wRobot  = 0;       //velocidad angular del robot
+double phi = 0;           //angulo de orientacion
 const double R = 0.0381; // radio de la llanta
 const double d = 0.22352; // Distancia entre llantas
 
@@ -77,13 +77,13 @@ void setup()
   Serial.begin(9600);
 
   ////////////////// SINTONIA FINA PID //////////////////
-  motor1.setGains(0.29, 0.05, 0.05); // (Kc,Ti,Td)
+  motor1.setGains(0.29, 0.05, 0.05); // sintonia para setear los valores de control de potencia
 
   ////////////////// Limites de señales //////////////////
-  motor1.setCvLimits(255,20);
-  motor1.setPvLimits(15,0);
+  motor1.setCvLimits(255,20);//valores reales de potencia
+  motor1.setPvLimits(15,0); //valores transformados de potencia
 
-  motor2.setGains(0.29, 0.05, 0.05); // (Kc,Ti,Td);
+  motor2.setGains(0.29, 0.05, 0.05); // sintonia para setear los valores de control de potencia;
   ////////////////// Limites de señales //////////////////
   motor2.setCvLimits(255,20);
   motor2.setPvLimits(15,0);
@@ -123,7 +123,7 @@ void setup()
 void loop() {
    ////////// SI RECIBE DATOS /////////////
 
-  if (stringComplete)
+  if (stringComplete)     //lectura de los datos enviados desde python
   {
     for (int i = 0; i < dataLength ; i++)
     {
@@ -132,7 +132,7 @@ void loop() {
       inputString = inputString.substring(index + 1);
      }
 
-    velocityMotor(data[0],data[1]);
+    velocityMotor(data[0],data[1]); //transforma las velocidades de referencia enviadas desde python a valores reales de control
 
     inputString = "";
     stringComplete = false;
@@ -141,19 +141,19 @@ void loop() {
   /////////////////// CONTROLADOR PID ////////////////
   if(millis()-lastTime >= sampleTime)
   {
-    wR = (constValue*countR)/(millis()-lastTime);
+    wR = (constValue*countR)/(millis()-lastTime); //transforma la lectura de los encoders en velocidad para saber la velocidad de los motores
     wL = (constValue*countL)/(millis()-lastTime);
     lastTime = millis();
     countR = 0;
     countL = 0;
 
-    velocityRobot(wR,wL);   
-    phi = phi+wRobot*0.1;
+    velocityRobot(wR,wL);   //obtiene la velocidad global del robot 
+    phi = phi+wRobot*0.1;   //obtiene el angulo de referencia del robot
 
     
     // outValueR = motor1.compute(data[0],wR);
     // outValueL = motor2.compute(data[1],wL);
-    outValueR = motor1.compute(w1Ref,wR);
+    outValueR = motor1.compute(w1Ref,wR);   //asigna la velocidad de los motores 
     outValueL = motor2.compute(w2Ref,wL);
     Serial.println(w1Ref);
     Serial.println(w2Ref);
@@ -170,7 +170,7 @@ void loop() {
 
 /////////////// RECEPCION DE DATOS /////////////////////
 
-void serialEvent() {
+void serialEvent() {        //recibe los valores enviados desde python y los asigna a una cadena de lectura
   while (Serial.available()) {
     char inChar = (char)Serial.read();
     inputString += inChar;
@@ -237,13 +237,13 @@ void anticlockwise(int pin1, int pin2,int analogPin, int pwm)
 
 
 
-void velocityRobot(double w1, double w2)
+void velocityRobot(double w1, double w2)    //calculo de la velocidad global del robot 
 {
   uRobot = (R*(w1+w2))/2;
   wRobot = (R*(w1-w2))/d;
 }
 
-void velocityMotor(double u, double w)
+void velocityMotor(double u, double w)  //calculo de la velocidad de cada rueda 
 {
   w1Ref = (u+(d*w/2))/R;
   w2Ref = (u-(d*w/2))/R;
