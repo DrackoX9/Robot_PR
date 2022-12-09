@@ -3,7 +3,7 @@ from pyArduino import *
 
 from tkinter import *
 from tkinter import filedialog
-from PIL import Image, ImageTk # pip install pil
+from PIL import Image, ImageTk
 
 import os
 import cv2
@@ -33,9 +33,10 @@ def takePhoto():
     if ret:
         img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         img = Image.fromarray(img)
+        img.thumbnail((300,300))
         tkimage = ImageTk.PhotoImage(img)
-        label1.configure(image = tkimage)
-        label1.image = tkimage
+        labelLastPhoto.configure(image = tkimage)
+        labelLastPhoto.image = tkimage
         cv2.imwrite(os.getcwd()+"\imagen"+str(numImage.get())+".jpg",frame)
         numImage.set(numImage.get() + 1)
 
@@ -84,7 +85,7 @@ def faceDetection(rawImagen):
     # const int scale = 3;
     # cv2.Mat resized_frame_gray( cvRound( frame_gray.rows / scale ), cvRound( frame_gray.cols / scale ), CV_8UC1 );
     # cv2.resize( frame_gray, resized_frame_gray, resized_frame_gray.size() );
-    faces = faceCascade.detectMultiScale(gray, scaleFactor=1.3, minNeighbors=4) # Deteccion de objeto
+    faces = faceCascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=4) # Deteccion de objeto
     drawRectangle(faces, rawImagen, (77, 210, 212), 'Se detectó la cara una persona') # CELESTE
 
 def upperBodyDetection(rawImagen):
@@ -93,7 +94,7 @@ def upperBodyDetection(rawImagen):
     gray = cv2.cvtColor(rawImagen, cv2.COLOR_BGR2GRAY) # Convertir a RGB a grises
 
     ########### Segmentación,Extracción de características,Reconocimiento ################
-    upperBodies = upperBody.detectMultiScale(gray, scaleFactor=1.3, minNeighbors=4) # Deteccion de objeto
+    upperBodies = upperBody.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=4) # Deteccion de objeto
     drawRectangle(upperBodies, rawImagen, (199, 87, 216), 'Se detectó la parte superior de una persona') # ROSADO
 
 
@@ -103,7 +104,7 @@ def lowerBodyDetection(rawImagen):
     gray = cv2.cvtColor(rawImagen, cv2.COLOR_BGR2GRAY) # Convertir a RGB a grises
 
     ########### Segmentación,Extracción de características,Reconocimiento ################
-    lowerBodies = lowerBody.detectMultiScale(gray, scaleFactor=1.3, minNeighbors=4) # Deteccion de objeto
+    lowerBodies = lowerBody.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=4) # Deteccion de objeto
     drawRectangle(lowerBodies, rawImagen, (85, 227, 108), 'Se detectó la parte inferior de una persona') # VERDE
 
 
@@ -113,7 +114,7 @@ def fullBodyDetection(rawImagen):
     gray = cv2.cvtColor(rawImagen, cv2.COLOR_BGR2GRAY) # Convertir a RGB a grises
 
     ########### Segmentación,Extracción de características,Reconocimiento ################
-    fullBodies = fullBody.detectMultiScale(gray, scaleFactor=1.3, minNeighbors=4) # Deteccion de objeto
+    fullBodies = fullBody.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=4) # Deteccion de objeto
     drawRectangle(fullBodies, rawImagen, (217, 90, 90), 'Se detectó el cuerpo completo de una persona') # ROJO
 
 def toggle():
@@ -174,7 +175,7 @@ def callback():
             wRef = 0
 
             # Llama a las funciones para detectar distintas partes de una persona
-            #faceDetection(frameBodyDetection)
+            faceDetection(frameBodyDetection)
             upperBodyDetection(frameBodyDetection)
             #lowerBodyDetection(frameBodyDetection)
             #fullBodyDetection(frameBodyDetection)
@@ -206,20 +207,20 @@ def callback():
 
             imgBodyDetection = cv2.cvtColor(frameBodyDetection, cv2.COLOR_BGR2RGB)    
             imgBodyDetection = Image.fromarray(imgBodyDetection)
-            imgBodyDetection.thumbnail((180,180))
+            imgBodyDetection.thumbnail((300,300))
             tkimageBD = ImageTk.PhotoImage(imgBodyDetection)
             labelBDCam.configure(image = tkimageBD)
             labelBDCam.image = tkimageBD
             
             img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)    
             img = Image.fromarray(img)
-            img.thumbnail((180,180))
+            img.thumbnail((300,300))
             tkimage = ImageTk.PhotoImage(img)
             label.configure(image = tkimage)
             label.image = tkimage
             
             img1 = Image.fromarray(binary)
-            img1.thumbnail((180,180))
+            img1.thumbnail((300,300))
             tkimage1 = ImageTk.PhotoImage(img1) 
             label1.configure(image = tkimage1)
             label1.image = tkimage1
@@ -293,6 +294,9 @@ label1.grid(row= 0,column=1,padx=20,pady=20)
 
 labelBDCam=Label(root)
 labelBDCam.grid(row= 4,column=0,padx=20,pady=20)
+
+labelLastPhoto=Label(root)
+labelLastPhoto.grid(row= 4,column=1,padx=20,pady=20)
 
 umbralValue = IntVar()
 slider = Scale(root,label = 'Threshold value', from_=0, to=255, orient=HORIZONTAL,command=thresholdValue,length=400)   #Creamos un dial para recoger datos numericos
